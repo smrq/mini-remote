@@ -1,0 +1,19 @@
+#pragma once
+#include "shared.h"
+
+void led_on(void);
+void led_off(void);
+void debug_1_on(void);
+void debug_1_off(void);
+void debug_1_toggle(void);
+void debug_2_on(void);
+void debug_2_off(void);
+void debug_2_toggle(void);
+void enable_extib(void);
+void disable_extib(void);
+void clear_extib(void);
+void clear_tim3_update(void);
+void set_tim3_low(void);
+void set_tim3_high(void);
+void enable_ir(void);
+void disable_ir(void);
