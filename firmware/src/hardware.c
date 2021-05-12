@@ -33,11 +33,11 @@ void debug_2_toggle(void){
 }
 
 void enable_extib(void) {
-	PB_CR2 |= 0b111111;
+	PB_CR2 |= 0x7F;
 }
 
 void disable_extib(void) {
-	PB_CR2 &= ~0b111111;
+	PB_CR2 &= ~0x7F;
 }
 
 void clear_extib(void) {

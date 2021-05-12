@@ -12,7 +12,7 @@
 // F_CPU (16e6) * 0.0005625 = 9000
 #define TIMER_COUNT_562_5uS 9000
 
-#define ROW_COUNT 6
+#define ROW_COUNT 7
 #define ROW_MASK ((1<<(ROW_COUNT+1))-1)
 
 #define COL_COUNT 3

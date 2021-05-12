@@ -45,15 +45,15 @@ void init_gpio(void) {
 	PA_ODR = 0b00000001;
 	
 	// Port B:
-	// 0-5: Rows 1-5 -> Input (DDR=0), pull-up (CR1=1), interrupts enabled (CR2=1)
-	// 6-7: Unused   -> Output (DDR=1), push-pull (CR1=1), low
-	PB_DDR = 0b11000000; 
+	// 0-6: Rows 0-6 -> Input (DDR=0), pull-up (CR1=1), interrupts enabled (CR2=1)
+	// 7:   Unused   -> Output (DDR=1), push-pull (CR1=1), low
+	PB_DDR = 0b10000000;
 	PB_CR1 = 0b11111111;
-	PB_CR2 = 0b00111111;
+	PB_CR2 = 0b01111111;
 	PB_ODR = 0b00000000;
 	
 	// Port C:
-	// 0-2: Columns 1-2 -> Output (DDR=1), open drain* (CR1=0), low during halt
+	// 0-2: Columns 0-2 -> Output (DDR=1), open drain* (CR1=0), low during halt
 	// 3-7: Unused      -> Output (DDR=1), push-pull (CR1=1), low
 	// *Ignored for true open drain pins (C0, C1)
 	PC_DDR = 0b11111111;

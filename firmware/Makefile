@@ -29,6 +29,9 @@ docker: Dockerfile
 flash: $(TARGET)
 	stm8flash -c stlinkv2 -p stm8l101f3 -s flash -w $(TARGET)
 
+dump:
+	stm8flash -c stlinkv2 -p stm8l101f3 -s flash -r dump.ihx
+
 $(BINDIR)/%.rel: $(SRCDIR)/%.c
 	$(RUN) mkdir -p bin
 	$(RUN) $(CC) -c $(CFLAGS) -o $@ $^
