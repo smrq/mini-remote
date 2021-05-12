@@ -10,12 +10,15 @@ The design for the PCB was done in KiCad. The PCB is designed according to the s
 
 Microcontroller
 
-* **U1** [STM8L101xx (STMicroelectronics STM8L101F3P3)](https://www.mouser.com/ProductDetail/511-STM8L101F3P3)
+* **U1** [STMicroelectronics STM8L101F3P3](https://www.mouser.com/ProductDetail/511-STM8L101F3P3)
+	* STM8L101F3P6 is fine too
+	* Any STM8L101FxPy is probably ok as long as the firmware can be squished to fit
 
 LEDs
 
 * **D1** [940nm IR LED (Everlight IR333/H0/L10)](https://www.mouser.com/ProductDetail/638-IR333-H0-L10)
 * **D2** [2x3x4 LED, red (Chanzon)](https://www.amazon.com/Rectangle-Diffused-Lighting-Electronics-Components/dp/B01C3ZZT1E)
+	* Or whatever LEDs you have lying around really
 
 Resistors
 
@@ -42,7 +45,7 @@ Etc.
 
 ## Firmware
 
-Building the firmware is done with Docker, but flashing the firmware requires USB hardware access that is beyond my Docker capabilities, if possible at all.
+Building the firmware is done with Docker, but flashing the firmware requires USB hardware access that is beyond my Docker capabilities, if it is possible at all.
 
 Prerequisites:
 
