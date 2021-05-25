@@ -9,10 +9,10 @@ u8 send_bit;
 u8 send_burst;
 
 u32 messages[COL_COUNT * ROW_COUNT] = {
-	MESSAGE_16(0xA51C),         // 0,0: Receiver power
+	MESSAGE_16(0x0702),         // 0,0: TV power (Samsung format)
 	NO_MESSAGE(),               // 0,1: No button
 	MESSAGE_16(0xA50A),         // 0,2: Volume up
-	MESSAGE_16(0x0702),         // 1,0: TV power (Samsung format)
+	MESSAGE_16(0xA51C),         // 1,0: Receiver power
 	MESSAGE_16(0xA512),         // 1,1: Mute
 	MESSAGE_16(0xA50B),         // 1,2: Volume down
 	MESSAGE_32(0xA556, 0xA5C1), // 2,0: Previous input
@@ -30,6 +30,16 @@ u32 messages[COL_COUNT * ROW_COUNT] = {
 	NO_MESSAGE(),               // 6,0: Not assigned
 	NO_MESSAGE(),               // 6,1: Not assigned
 	NO_MESSAGE(),               // 6,2: Not assigned
+};
+
+u8 messageFormats[COL_COUNT * ROW_COUNT] = {
+	FORMAT_SAMSUNG, FORMAT_NEC, FORMAT_NEC, // Row 0
+	FORMAT_NEC, FORMAT_NEC, FORMAT_NEC, // Row 1
+	FORMAT_NEC, FORMAT_NEC, FORMAT_NEC, // Row 2
+	FORMAT_NEC, FORMAT_NEC, FORMAT_NEC, // Row 3
+	FORMAT_NEC, FORMAT_NEC, FORMAT_NEC, // Row 4
+	FORMAT_NEC, FORMAT_NEC, FORMAT_NEC, // Row 5
+	FORMAT_NEC, FORMAT_NEC, FORMAT_NEC, // Row 6
 };
 
 void main(void) {
@@ -115,11 +125,7 @@ u32 get_message(u8 button) {
 }
 
 MessageFormat get_message_format(u8 button) {
-	if (button == 3) { // 1,0
-		return FORMAT_SAMSUNG;
-	} else {
-		return FORMAT_NEC;
-	}
+	return messageFormats[button];
 }
 
 void run_tx_state_machine(void) {
