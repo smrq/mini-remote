@@ -1,7 +1,8 @@
 #include "main.h"
 
 MessageFormat message_format;
-u16 command;
+u8 address;
+u8 command;
 
 SendState send_state;
 u8 send_bit;
@@ -56,7 +57,8 @@ void main(void) {
 			u32 message = get_message(button);
 
 			while (message != 0) {
-				command = message & 0xFFFF;
+				command = message & 0xFF;
+				address = (message >> 8) & 0xFF;
 				message = message >> 16;
 				send_state = SEND_HEADER1;
 				send_burst = 0;
@@ -146,7 +148,7 @@ void run_tx_state_machine(void) {
 				set_tim3_low();
 			}
 
-			if (command & (1 << (8+send_bit))) {
+			if (address & (1 << send_bit)) {
 				if (++send_burst == 4) {
 					send_burst = 0;
 					++send_bit;
@@ -172,7 +174,7 @@ void run_tx_state_machine(void) {
 				set_tim3_low();
 			}
 
-			if ((message_format == FORMAT_SAMSUNG ? command : ~command) & (1 << (8+send_bit))) {
+			if ((message_format == FORMAT_SAMSUNG ? address : ~address) & (1 << send_bit)) {
 				if (++send_burst == 4) {
 					send_burst = 0;
 					++send_bit;
