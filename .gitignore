@@ -1,8 +1,2 @@
 .DS_Store
-
-firmware/bin
-*.ihx
-
-fp-info-cache
-*.kicad_pcb-bak
-*.sch-bak
+*~
