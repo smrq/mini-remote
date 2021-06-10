@@ -2,7 +2,7 @@ const fs = require('fs');
 const { compile, globals } = require('@smrq/openscad-js');
 
 with (globals(x => eval(x))) {
-	const eps = 0.001;
+	const eps = 0.01;
 
 	function flatten(arr) {
 		return [].concat(...arr);
@@ -23,21 +23,27 @@ with (globals(x => eval(x))) {
 	const pcbMargin = 0.5;
 	const wallThickness = 1.5;
 	const overhangThickness = 1.5;
+	const overhangGap = 0.25;
 
 	const innerSizePcbEdge = {
 		x: pcbSize.x + 2*pcbMargin,
 		y: pcbSize.y + 2*pcbMargin,
 	};
 
-	const innerSizeMidWall = {
+	const innerSizeMidWallInside = {
 		x: innerSizePcbEdge.x + 2*overhangThickness,
 		y: innerSizePcbEdge.y + 2*overhangThickness,
+	};
+
+	const innerSizeMidWallOutside = {
+		x: innerSizeMidWallInside.x + 2*overhangGap,
+		y: innerSizeMidWallInside.y + 2*overhangGap,
 	};
 
 	const topY = -56;
 	const bottomY = 56 + 15;
 	const outerSize = {
-		x: innerSizeMidWall.x + 2*wallThickness,
+		x: innerSizeMidWallOutside.x + 2*wallThickness,
 		y: bottomY - topY,
 	};
 
@@ -53,12 +59,14 @@ with (globals(x => eval(x))) {
 	const buttonPositions = [
 		[[-15,    15], -44.25],
 		[[-15, 0, 15], -30.75],
-		[[-7,      7],  -9.75],
+		[[-7.5,    8],  -9.75],
 		[[-15, 0, 15],   3.75],
 		[[-15, 0, 15],  17.25],
 		[[-15, 0, 15],  30.75],
 		[[-15, 0, 15],  44.25],
 	];
+	const buttonCutoutSize = 6.25;
+
 	const screwPositions = [
 		[0, -3],
 		[-18, -37.5],
@@ -66,6 +74,11 @@ with (globals(x => eval(x))) {
 		[-18,  37.5],
 		[ 18,  37.5],
 	];
+	const screwRadius = 1.25;
+	const screwCountersinkRadius = 1.85;
+	const screwPostRadius = 3;
+	const nutRadius = 2.75;
+
 	const ledCutoutRadius = 3.2;
 
 	const topModel = difference()(
@@ -75,19 +88,19 @@ with (globals(x => eval(x))) {
 					cube2([outerSize.x, bottomY - topY, topOuterZ - overhangZ], { center: [true, false, false] })
 				),
 				translate([0, 0, overhangZ - eps])(
-					cube2([innerSizeMidWall.x, innerSizeMidWall.y, topInnerZ - overhangZ + eps], { center: [true, true, false] })
+					cube2([innerSizeMidWallOutside.x, innerSizeMidWallOutside.y, topInnerZ - overhangZ + eps], { center: [true, true, false] })
 				),
 			),
 			...screwPositions.map(([x, y]) => (
 				translate([x, y, pcbTopZ])(
-					cylinder({ r: 3, h: topInnerZ - pcbTopZ })
+					cylinder({ r: screwPostRadius, h: topInnerZ - pcbTopZ })
 				)
 			))
 		),
 		...flatten(buttonPositions.map(([xs, y]) => xs.map(x => (
 			translate([x, y, topInnerZ - eps])(
 				minkowski()(
-					cube2([6, 6, topOuterZ - topInnerZ + eps], { center: [true, true, false] }),
+					cube2([buttonCutoutSize, buttonCutoutSize, topOuterZ - topInnerZ + eps], { center: [true, true, false] }),
 					cylinder({ r: 0.25, h: eps })
 				)
 			)
@@ -101,10 +114,10 @@ with (globals(x => eval(x))) {
 		...screwPositions.map(([x, y]) => (
 			union()(
 				translate([x, y, topOuterZ - 1.4])(
-					cylinder({ r: 1.75, h: 1.4 + eps })
+					cylinder({ r: screwCountersinkRadius, h: 1.4 + eps })
 				),
 				translate([x, y, pcbTopZ - eps])(
-					cylinder({ r: 1.1, h: topOuterZ - pcbTopZ + 2*eps })	
+					cylinder({ r: screwRadius, h: topOuterZ - pcbTopZ + 2*eps })	
 				),
 			)
 		))
@@ -118,7 +131,7 @@ with (globals(x => eval(x))) {
 						cube2([outerSize.x, bottomY - topY, overhangZ - bottomOuterZ], { center: [true, false, false] })
 					),
 					translate([0, 0, overhangZ])(
-						cube2([innerSizeMidWall.x, innerSizeMidWall.y, topInnerZ - overhangZ], { center: [true, true, false] })
+						cube2([innerSizeMidWallInside.x, innerSizeMidWallInside.y, topInnerZ - overhangZ], { center: [true, true, false] })
 					),
 				),
 				translate([0, 0, bottomInnerZ])(
@@ -139,7 +152,7 @@ with (globals(x => eval(x))) {
 		...screwPositions.map(([x, y]) => (
 			union()(
 				translate([x, y, bottomOuterZ - eps])(
-					cylinder({ r: 2.25, h: 1.5 + eps, $fn: 6 })
+					cylinder({ r: nutRadius, h: 1.5 + eps, $fn: 6 })
 				),
 				translate([x, y, bottomOuterZ - eps])(
 					cylinder({ r: 1.1, h: pcbBottomZ - bottomOuterZ + 2*eps })
@@ -149,7 +162,7 @@ with (globals(x => eval(x))) {
 	)
 
 	const preview = union()(
-		translate([0, 0, 20])(topModel),
+		translate([0, 0, 10])(topModel),
 		bottomModel,
 	);
 
@@ -157,5 +170,5 @@ with (globals(x => eval(x))) {
 
 	fs.writeFileSync('top.scad', header + compile(topModel), 'utf8');
 	fs.writeFileSync('bottom.scad', header + compile(bottomModel), 'utf8');
-	fs.writeFileSync('preview.scad', header + compile(bottomModel), 'utf8');
+	fs.writeFileSync('preview.scad', header + compile(preview), 'utf8');
 }
