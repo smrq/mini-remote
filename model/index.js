@@ -23,7 +23,7 @@ with (globals(x => eval(x))) {
 	const pcbMargin = 0.5;
 	const wallThickness = 1.5;
 	const overhangThickness = 1.5;
-	const overhangGap = 0.25;
+	const overhangGap = 0.5;
 
 	const innerSizePcbEdge = {
 		x: pcbSize.x + 2*pcbMargin,
@@ -77,7 +77,9 @@ with (globals(x => eval(x))) {
 	const screwRadius = 1.25;
 	const screwCountersinkRadius = 1.85;
 	const screwPostRadius = 3;
-	const nutRadius = 2.75;
+	const threadedInsertRadius = 1.85;
+	const threadedInsertDepth = 5;
+	const threadedInsertPostRadius = 3.85;
 
 	const ledCutoutRadius = 3.2;
 
@@ -140,7 +142,7 @@ with (globals(x => eval(x))) {
 			),
 			...screwPositions.map(([x, y]) => (
 				translate([x, y, bottomInnerZ])(
-					cylinder({ r: 3, h: pcbBottomZ - bottomInnerZ })
+					cylinder({ r: threadedInsertPostRadius, h: pcbBottomZ - bottomInnerZ })
 				)
 			))
 		),
@@ -151,11 +153,11 @@ with (globals(x => eval(x))) {
 		),
 		...screwPositions.map(([x, y]) => (
 			union()(
-				translate([x, y, bottomOuterZ - eps])(
-					cylinder({ r: nutRadius, h: 1.5 + eps, $fn: 6 })
+				translate([x, y, pcbBottomZ - threadedInsertDepth])(
+					cylinder({ r: threadedInsertRadius, h: threadedInsertDepth + eps })
 				),
-				translate([x, y, bottomOuterZ - eps])(
-					cylinder({ r: 1.1, h: pcbBottomZ - bottomOuterZ + 2*eps })
+				translate([x, y, bottomInnerZ - eps])(
+					cylinder({ r: screwRadius, h: pcbBottomZ - bottomInnerZ + 2*eps })
 				),
 			)
 		))
@@ -168,7 +170,7 @@ with (globals(x => eval(x))) {
 
 	const header = '$fn = 100;\n';
 
-	fs.writeFileSync('top.scad', header + compile(topModel), 'utf8');
-	fs.writeFileSync('bottom.scad', header + compile(bottomModel), 'utf8');
-	fs.writeFileSync('preview.scad', header + compile(preview), 'utf8');
+	fs.writeFileSync('scad/top.scad', header + compile(topModel), 'utf8');
+	fs.writeFileSync('scad/bottom.scad', header + compile(bottomModel), 'utf8');
+	fs.writeFileSync('scad/preview.scad', header + compile(preview), 'utf8');
 }
