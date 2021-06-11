@@ -23,7 +23,7 @@ with (globals(x => eval(x))) {
 	const pcbMargin = 0.5;
 	const wallThickness = 1.5;
 	const overhangThickness = 1.5;
-	const overhangGap = 0.5;
+	const overhangGap = 0.4;
 
 	const innerSizePcbEdge = {
 		x: pcbSize.x + 2*pcbMargin,
@@ -49,23 +49,23 @@ with (globals(x => eval(x))) {
 
 	const topOuterZ = 5;
 	const topInnerZ = 3;
+	const overhangZ = 0;
 	const pcbTopZ = 0;
 	const pcbBottomZ = -1.6;
 	const ledCenterZ = -4.8;
-	const overhangZ = 0;
 	const bottomInnerZ = -8;
 	const bottomOuterZ = -10;
 
 	const buttonPositions = [
-		[[-15,    15], -44.25],
-		[[-15, 0, 15], -30.75],
-		[[-7.5,    8],  -9.75],
-		[[-15, 0, 15],   3.75],
-		[[-15, 0, 15],  17.25],
-		[[-15, 0, 15],  30.75],
-		[[-15, 0, 15],  44.25],
+		[[15,    -15], -44.25],
+		[[15, 0, -15], -30.75],
+		[[7.5,    -8],  -9.75],
+		[[15, 0, -15],   3.75],
+		[[15, 0, -15],  17.25],
+		[[15, 0, -15],  30.75],
+		[[15, 0, -15],  44.25],
 	];
-	const buttonCutoutSize = 6.25;
+	const buttonCutoutSize = 7.5;
 
 	const screwPositions = [
 		[0, -3],
@@ -74,14 +74,18 @@ with (globals(x => eval(x))) {
 		[-18,  37.5],
 		[ 18,  37.5],
 	];
-	const screwRadius = 1.25;
-	const screwCountersinkRadius = 1.85;
+	const screwRadius = 1.35;
+	const screwCountersinkRadius = 2;
 	const screwPostRadius = 3;
-	const threadedInsertRadius = 1.85;
+	const threadedInsertRadius = 1.95;
 	const threadedInsertDepth = 5;
-	const threadedInsertPostRadius = 3.85;
+	const threadedInsertPostRadius = 3.95;
 
-	const ledCutoutRadius = 3.2;
+	const irLedCutoutRadius = 3.2;
+	const statusLedCutoutSize = {
+		x: 4,
+		y: 2.75,
+	};
 
 	const topModel = difference()(
 		union()(
@@ -101,17 +105,11 @@ with (globals(x => eval(x))) {
 		),
 		...flatten(buttonPositions.map(([xs, y]) => xs.map(x => (
 			translate([x, y, topInnerZ - eps])(
-				minkowski()(
-					cube2([buttonCutoutSize, buttonCutoutSize, topOuterZ - topInnerZ + eps], { center: [true, true, false] }),
-					cylinder({ r: 0.25, h: eps })
-				)
+				cube2([buttonCutoutSize, buttonCutoutSize, topOuterZ - topInnerZ + 2*eps], { center: [true, true, false] }),
 			)
 		)))),
 		translate([0, -46.25, topInnerZ - eps])(
-			minkowski()(
-				cube2([3.2, 2, topOuterZ - topInnerZ + eps], { center: [true, true, false] }),
-				cylinder({ r: 0.25, h: eps })
-			)
+			cube2([statusLedCutoutSize.x, statusLedCutoutSize.y, topOuterZ - topInnerZ + 2*eps], { center: [true, true, false] }),
 		),
 		...screwPositions.map(([x, y]) => (
 			union()(
@@ -133,7 +131,7 @@ with (globals(x => eval(x))) {
 						cube2([outerSize.x, bottomY - topY, overhangZ - bottomOuterZ], { center: [true, false, false] })
 					),
 					translate([0, 0, overhangZ])(
-						cube2([innerSizeMidWallInside.x, innerSizeMidWallInside.y, topInnerZ - overhangZ], { center: [true, true, false] })
+						cube2([innerSizeMidWallInside.x, innerSizeMidWallInside.y, (topInnerZ - overhangGap) - overhangZ], { center: [true, true, false] })
 					),
 				),
 				translate([0, 0, bottomInnerZ])(
@@ -148,17 +146,12 @@ with (globals(x => eval(x))) {
 		),
 		translate([0, topY + 15, ledCenterZ])(
 			rotate([90, 0, 0])(
-				cylinder({ r: ledCutoutRadius, h: 30 })
+				cylinder({ r: irLedCutoutRadius, h: 30 })
 			)
 		),
 		...screwPositions.map(([x, y]) => (
-			union()(
-				translate([x, y, pcbBottomZ - threadedInsertDepth])(
-					cylinder({ r: threadedInsertRadius, h: threadedInsertDepth + eps })
-				),
-				translate([x, y, bottomInnerZ - eps])(
-					cylinder({ r: screwRadius, h: pcbBottomZ - bottomInnerZ + 2*eps })
-				),
+			translate([x, y, bottomInnerZ])(
+				cylinder({ r: threadedInsertRadius, h: pcbBottomZ - bottomInnerZ + eps })
 			)
 		))
 	)
